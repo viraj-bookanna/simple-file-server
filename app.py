@@ -1,15 +1,23 @@
 import os
 from flask import Flask,request,send_from_directory
+from dotenv import load_dotenv
+
+load_dotenv(override=True)
+
+SERVER_ROOT = os.getenv("SERVER_ROOT", os.getcwd())
 
 app = Flask(__name__)
 
 @app.route('/files/', methods = ['GET'])
 def list_files():
     retval = ''
-    for item in os.scandir(os.getcwd()):
+    for item in os.scandir(SERVER_ROOT):
         if item.is_file():
-            retval += '<a href="/file/{}"></a><br>'.format(item.name)
+            retval += f'<a href="/file/{item.name}">{item.name}</a><br>'
     return retval
 @app.route('/file/<filename>', methods = ['GET'])
 def getfile(filename):
-    return send_from_directory(os.getcwd(), filename)
+    return send_from_directory(SERVER_ROOT, filename)
+
+if __name__ == '__main__':
+    app.run()
